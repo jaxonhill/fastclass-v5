@@ -1,19 +1,14 @@
+# Imports
 from selenium.webdriver.common.by import By
+import time
 
+# Classes
 from classes.BaseSelenium import BaseSelenium
-
-# NOTE: LAYOUT OF THE ACTUAL PROGRAM
 
 # OOP LAYOUT
 
-# Base class for a selenium headless browser (static variable cookies)
-#   Method to create the headless browser
-#   Method to go to a URL
-#   Method to retrieve an object based on CSS selector, class name, etc.
 # StartSeleniumInstance
 # MoreThan50ClassOptionsSeleniumInstance
-
-# TODO: Just get the base class and the start done!
 
 # MAKE NOTES OF HOW THIS SYSTEM COULD BE IMPROVED FURTHER FOR 100% COVERAGE FOR EDGE CASES, etc.
 # MAKE NOTES OF "WEIRDNESS" IN SDSU SYSTEM SO YOU UNDERSTAND LATER
@@ -42,24 +37,21 @@ from classes.BaseSelenium import BaseSelenium
 
 START_PAGE_URL: str = "https://cmsweb.cms.sdsu.edu/psc/CSDPRD/EMPLOYEE/SA/c/SSR_STUDENT_FL.SSR_CLSRCH_MAIN_FL.GBL"
 SPRING_2024_LINK_TEXT: str = "Spring 2024"
+ADVANCED_SEARCH_CSS_ID: str = "SSR_CLSRCH_FLDS_PTS_ADV_SRCH"
 
 
 def main():
-    # Intialize StartInstance (headless)
-    startInstance: BaseSelenium = BaseSelenium(isHeadless=True)
-    # Go to that URL
+    startInstance: BaseSelenium = BaseSelenium(isHeadless=False)
     startInstance.goto(START_PAGE_URL)
-    # Get the spring_a_tag by Link Text of "Spring 2024" and click it
-    startInstance.retrieveHTMLElement(By.LINK_TEXT, SPRING_2024_LINK_TEXT)
-    # Set the cookies
+    # startInstance.retrieveHTMLElement(By.LINK_TEXT, SPRING_2024_LINK_TEXT).click()
+    startInstance.retrieveHTMLElement("BLAH", SPRING_2024_LINK_TEXT).click()
+    startInstance.setStaticCookieValues()
     # Get the advanced_search_a_tag by ID of "SSR_CLSRCH_FLDS_PTS_ADV_SRCH" and click it
     # Get the available subjects select
     # Find children of that select element that:
     #   Are option tags
     #   Do not have aria-invalid="true" attribute
     # Get all these children's value attribute tag
-
-    pass
 
 
 if __name__ == "__main__":
