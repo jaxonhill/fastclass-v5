@@ -1,9 +1,41 @@
-# Imports
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.remote.webelement import WebElement
 import time
 
-# Classes
 from classes.BaseSelenium import BaseSelenium
+from classes.StartInstanceSelenium import StartInstanceSelenium
+
+START_PAGE_URL: str = "https://cmsweb.cms.sdsu.edu/psc/CSDPRD/EMPLOYEE/SA/c/SSR_STUDENT_FL.SSR_CLSRCH_MAIN_FL.GBL"
+SPRING_2024_LINK_TEXT: str = "Spring 2024"
+ADVANCED_SEARCH_LINK_CSS_ID: str = "SSR_CLSRCH_FLDS_PTS_ADV_SRCH"
+ADVANCED_SEARCH_IFRAME_CSS_SELECTOR: str = "ptModFrame_0"
+SUBJECTS_SELECT_CSS_SELECTOR: str = "#SSR_CLSRCH_ADV_SSR_ADVSRCH_OP2\$0"
+
+
+def main():
+    # Start selenium driver, click on Spring 2024 to set cookie that identifies this for later
+    startInstance: StartInstanceSelenium = StartInstanceSelenium(isHeadless=True)
+    startInstance.goto(START_PAGE_URL)
+    startInstance.retrieveHTMLElement(By.LINK_TEXT, SPRING_2024_LINK_TEXT).click()
+    startInstance.setStaticCookieValues()
+
+    # Switch to advanced search iframe and get all the subject tags for current semester
+    startInstance.retrieveHTMLElement(By.ID, ADVANCED_SEARCH_LINK_CSS_ID).click()
+    # Check reference FAQ, we MUST search by Tag Name and just look for an iframe
+    iframe_element: WebElement = startInstance.retrieveHTMLElement(
+        By.TAG_NAME, "iframe"
+    )
+    startInstance.switchToIFrame(iframe_element)
+    select_options: list[WebElement] = Select(
+        startInstance.retrieveHTMLElement(By.CSS_SELECTOR, SUBJECTS_SELECT_CSS_SELECTOR)
+    ).options
+    subject_tags: list[str] = startInstance.getValidSubjectTags(select_options)
+
+
+if __name__ == "__main__":
+    main()
+
 
 # OOP LAYOUT
 
@@ -13,11 +45,6 @@ from classes.BaseSelenium import BaseSelenium
 # MAKE NOTES OF HOW THIS SYSTEM COULD BE IMPROVED FURTHER FOR 100% COVERAGE FOR EDGE CASES, etc.
 # MAKE NOTES OF "WEIRDNESS" IN SDSU SYSTEM SO YOU UNDERSTAND LATER
 
-# GET ALL SUBJECTS AND COOKIES
-# Open headless selenium and go to start URL
-# Select term (ex. Spring 2024)
-# Get cookies for later
-# Open advanced search and get all the abbreviations of the class categories
 
 # DETERMINE HOW MANY COURSES FOR EACH CLASS AND CREATE ARRAYS
 # Iterate through these class category abbreviations as URLs using requests library
@@ -34,25 +61,3 @@ from classes.BaseSelenium import BaseSelenium
 
 # MAKE API CALL USING REQUESTS FOR EACH CLASS
 # Iterate through the class array for classes with 50 or less classes
-
-START_PAGE_URL: str = "https://cmsweb.cms.sdsu.edu/psc/CSDPRD/EMPLOYEE/SA/c/SSR_STUDENT_FL.SSR_CLSRCH_MAIN_FL.GBL"
-SPRING_2024_LINK_TEXT: str = "Spring 2024"
-ADVANCED_SEARCH_CSS_ID: str = "SSR_CLSRCH_FLDS_PTS_ADV_SRCH"
-
-
-def main():
-    startInstance: BaseSelenium = BaseSelenium(isHeadless=False)
-    startInstance.goto(START_PAGE_URL)
-    # startInstance.retrieveHTMLElement(By.LINK_TEXT, SPRING_2024_LINK_TEXT).click()
-    startInstance.retrieveHTMLElement("BLAH", SPRING_2024_LINK_TEXT).click()
-    startInstance.setStaticCookieValues()
-    # Get the advanced_search_a_tag by ID of "SSR_CLSRCH_FLDS_PTS_ADV_SRCH" and click it
-    # Get the available subjects select
-    # Find children of that select element that:
-    #   Are option tags
-    #   Do not have aria-invalid="true" attribute
-    # Get all these children's value attribute tag
-
-
-if __name__ == "__main__":
-    main()

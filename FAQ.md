@@ -7,6 +7,7 @@ Ok, not exactly a FAQ, but more of "Why did you make this choice?" type of quest
 - [Table of Contents](#table-of-contents)
 - [Scraping](#scraping)
   - [Why Python for the scraping?](#why-python-for-the-scraping)
+  - [Why do you have to search for the advanced search iframe by tag name?](#why-do-you-have-to-search-for-the-advanced-search-iframe-by-tag-name)
 
 
 ## Scraping
@@ -20,3 +21,7 @@ I wish I had some elaborate answer, but I went with Python for the scraping beca
 * Due to above point, there are many examples for extremely weird edge cases I might run into
 
 The only thing I wish I had in Python for scraping especially is stronger, enforced types. I use type hints wherever it is suitable; however, if this were to scale to other schools, I would heavily consider TypeScript and then just refactoring the SDSU scraper. Using TypeScript and types for scraping is incredibly useful -- especially if you are pulling from APIs.
+
+### Why do you have to search for the advanced search iframe by tag name?
+
+I tried to search for it by CSS Selector, but it would always break. The site uses a different CSS selector every time you open the site I believe. I'm not sure how this is even possible, but there will only be one iframe at the time you call the function anyway -- so just use the tag name of "iframe" and save yourself the headache.
