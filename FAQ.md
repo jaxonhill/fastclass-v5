@@ -8,6 +8,7 @@ Ok, not exactly a FAQ, but more of "Why did you make this choice?" type of quest
 - [Scraping](#scraping)
   - [Why Python for the scraping?](#why-python-for-the-scraping)
   - [Why do you have to search for the advanced search iframe by tag name?](#why-do-you-have-to-search-for-the-advanced-search-iframe-by-tag-name)
+- [Might Want To Think About Later](#might-want-to-think-about-later)
 
 
 ## Scraping
@@ -25,3 +26,7 @@ The only thing I wish I had in Python for scraping especially is stronger, enfor
 ### Why do you have to search for the advanced search iframe by tag name?
 
 I tried to search for it by CSS Selector, but it would always break. The site uses a different CSS selector every time you open the site I believe. I'm not sure how this is even possible, but there will only be one iframe at the time you call the function anyway -- so just use the tag name of "iframe" and save yourself the headache.
+
+## Might Want To Think About Later
+
+* Add exponential backoff for the WebDriverWaits and standardize them - if they fail like a 60 second wait or something, then the servers are down

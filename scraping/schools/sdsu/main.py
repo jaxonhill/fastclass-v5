@@ -11,11 +11,13 @@ SPRING_2024_LINK_TEXT: str = "Spring 2024"
 ADVANCED_SEARCH_LINK_CSS_ID: str = "SSR_CLSRCH_FLDS_PTS_ADV_SRCH"
 ADVANCED_SEARCH_IFRAME_CSS_SELECTOR: str = "ptModFrame_0"
 SUBJECTS_SELECT_CSS_SELECTOR: str = "#SSR_CLSRCH_ADV_SSR_ADVSRCH_OP2\$0"
+SEARCH_BUTTON_CSS_SELECTOR: str = "#SSR_CLSRCH_FLDS_SSR_SEARCH_PB_1\$0"
+PARAM_FOR_SEMESTER_CODE: str = "ES_STRM"
 
 
 def main():
     # Start selenium driver, click on Spring 2024 to set cookie that identifies this for later
-    startInstance: StartInstanceSelenium = StartInstanceSelenium(isHeadless=True)
+    startInstance: StartInstanceSelenium = StartInstanceSelenium(isHeadless=False)
     startInstance.goto(START_PAGE_URL)
     startInstance.retrieveHTMLElement(By.LINK_TEXT, SPRING_2024_LINK_TEXT).click()
     startInstance.setStaticCookieValues()
@@ -27,10 +29,20 @@ def main():
         By.TAG_NAME, "iframe"
     )
     startInstance.switchToIFrame(iframe_element)
-    select_options: list[WebElement] = Select(
+    subject_select_element: Select = Select(
         startInstance.retrieveHTMLElement(By.CSS_SELECTOR, SUBJECTS_SELECT_CSS_SELECTOR)
-    ).options
+    )
+    select_options: list[WebElement] = subject_select_element.options
     subject_tags: list[str] = startInstance.getValidSubjectTags(select_options)
+
+    # Select a subject option and submit to get semester code from resulting URL
+    subject_select_element.select_by_value(subject_tags[0])
+    startInstance.retrieveHTMLElement(
+        By.CSS_SELECTOR, SEARCH_BUTTON_CSS_SELECTOR
+    ).click()
+    startInstance.waitUntilURLContains("ES_STRM=")
+    semester_code: str = startInstance.getSemesterCodeFromURL()
+    print(semester_code)
 
 
 if __name__ == "__main__":

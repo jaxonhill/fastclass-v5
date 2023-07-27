@@ -24,6 +24,7 @@ class BaseSelenium:
 
     def setStaticCookieValues(self) -> None:
         cookies: list[dict] = self.driver.get_cookies()
+        print(cookies)
         for cookie in cookies:
             if cookie["name"] == "CSDPRD-PSJSESSIONID":
                 self.PSJ_SESSION_ID = cookie["value"].strip()

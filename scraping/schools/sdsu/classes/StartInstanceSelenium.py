@@ -1,6 +1,7 @@
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.remote.webelement import WebElement
+import re
 import time
 
 from classes.BaseSelenium import BaseSelenium
@@ -28,3 +29,11 @@ class StartInstanceSelenium(BaseSelenium):
         if not select_option.get_attribute("value"):
             return False
         return True
+
+    def waitUntilURLContains(self, param: str) -> None:
+        WebDriverWait(self.driver, 10).until(EC.url_contains(param))
+
+    def getSemesterCodeFromURL(self) -> str:
+        pattern = r"ES_STRM=(\d+)"
+        match = re.search(pattern, self.driver.current_url)
+        return match.group(1)
