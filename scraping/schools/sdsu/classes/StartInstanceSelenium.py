@@ -1,6 +1,8 @@
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.common.exceptions import NoSuchElementException
 import re
 import time
 
@@ -37,3 +39,25 @@ class StartInstanceSelenium(BaseSelenium):
         pattern = r"ES_STRM=(\d+)"
         match = re.search(pattern, self.driver.current_url)
         return match.group(1)
+
+    def waitForElement(self, retrieveBy: str, identifier: str) -> None:
+        if retrieveBy not in By.__dict__.values():
+            raise ValueError(f"Invalid 'retrieveBy' method provided: \"{retrieveBy}\"")
+        try:
+            WebDriverWait(self.driver, 100).until(
+                EC.presence_of_element_located((retrieveBy, identifier))
+            )
+        except NoSuchElementException:
+            raise NoSuchElementException(
+                f'Element with "{retrieveBy}" "{identifier}" not found.'
+            )
+
+    def doesElementExist(self, retrieveBy: str, identifier: str) -> bool:
+        if retrieveBy not in By.__dict__.values():
+            raise ValueError(f"Invalid 'retrieveBy' method provided: \"{retrieveBy}\"")
+
+        try:
+            ele: WebElement = self.driver.find_element(retrieveBy, identifier)
+            return True
+        except NoSuchElementException:
+            return False
