@@ -6,6 +6,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import NoSuchElementException
+import re
 
 
 def initDriver(isHeadless: bool) -> WebDriver:
@@ -14,13 +15,28 @@ def initDriver(isHeadless: bool) -> WebDriver:
     return webdriver.Chrome(options=options)
 
 
-def getHTMLElement(
+def getElement(
     driver: WebDriver, howManySeconds: int, retrieveBy: str, identifier: str
 ) -> WebElement:
     if retrieveBy not in By.__dict__.values():
         raise ValueError(f"Invalid 'retrieveBy' method provided: \"{retrieveBy}\"")
     try:
         return WebDriverWait(driver, howManySeconds).until(
+            EC.presence_of_element_located((retrieveBy, identifier))
+        )
+    except NoSuchElementException:
+        raise NoSuchElementException(
+            f'Element trying to be found by: "{retrieveBy}" with identifier: "{identifier}" not found.'
+        )
+
+
+def waitForElement(
+    driver: WebDriver, howManySeconds: int, retrieveBy: str, identifier: str
+) -> WebElement:
+    if retrieveBy not in By.__dict__.values():
+        raise ValueError(f"Invalid 'retrieveBy' method provided: \"{retrieveBy}\"")
+    try:
+        WebDriverWait(driver, howManySeconds).until(
             EC.presence_of_element_located((retrieveBy, identifier))
         )
     except NoSuchElementException:
@@ -55,6 +71,22 @@ def getCookies(driver: WebDriver) -> list[str]:
 def getValidSubjectTags(select_options: list[WebElement]) -> list[str]:
     validSelectOptions: list[WebElement] = filter(__isSelectOptionValid, select_options)
     return [option.get_attribute("value") for option in validSelectOptions]
+
+
+def getSemesterCodeFromURL(driver: WebDriver) -> str:
+    pattern = r"ES_STRM=(\d+)"
+    match = re.search(pattern, driver.current_url)
+    return match.group(1)
+
+
+def doesElementExist(driver: WebDriver, retrieveBy: str, identifier: str) -> bool:
+    if retrieveBy not in By.__dict__.values():
+        raise ValueError(f"Invalid 'retrieveBy' method provided: \"{retrieveBy}\"")
+    try:
+        driver.find_element(retrieveBy, identifier)
+        return True
+    except NoSuchElementException:
+        return False
 
 
 def __isSelectOptionValid(select_option: WebElement) -> bool:
